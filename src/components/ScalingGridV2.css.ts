@@ -386,7 +386,8 @@ export const resultCard = style({
 
   display: 'grid',
   gridTemplateRows: 'minmax(0, 0.8fr) minmax(0, 1.4fr) minmax(0, 0.8fr)',
-  placeItems: 'center',
+  alignItems: 'center',
+  justifyItems: 'stretch',
 
   borderRadius: radiusMd,
   padding: 'clamp(3px, min(1cqw, 0.6cqh), 6px)',
@@ -402,34 +403,63 @@ export const resultCardHeader = style({
   minWidth: 0,
   alignSelf: 'stretch',
 
-  display: 'grid',
-  gridTemplateColumns: 'minmax(0, 1fr) auto',
+  display: 'flex',
   alignItems: 'center',
+  justifyContent: 'space-between',
   gap: controlGap,
 });
 
+export const resultCardHeaderTitle = style({
+  minWidth: 0,
+  flex: '1 1 auto',
+
+  fontSize: fontXs,
+  lineHeight: 1,
+  fontWeight: 650,
+  textAlign: 'left',
+
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+});
+
 export const resultCardDeleteButton = style({
+  flex: '0 0 auto',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: ratioDeleteWidth,
-  minHeight: '1.5em',
+  margin: 0,
   padding: 0,
   border: 'none',
-  borderRadius: radiusSm,
-  background: '#dcdcdc',
-  color: '#111',
+  background: 'transparent',
+  boxShadow: 'none',
+  appearance: 'none',
+  color: '#888',
   cursor: 'pointer',
-  fontSize: fontMd,
-  lineHeight: 1,
-  fontWeight: 700,
+  lineHeight: 0,
 
   selectors: {
     '&:disabled': {
-      opacity: 0.35,
+      opacity: 0.3,
       cursor: 'default',
     },
+    '&:not(:disabled):hover': {
+      color: '#111',
+    },
+    '&:focus': {
+      outline: 'none',
+    },
+    '&:focus-visible': {
+      outline: '2px solid #111',
+      outlineOffset: '2px',
+      borderRadius: radiusSm,
+    },
   },
+});
+
+export const resultCardDeleteIcon = style({
+  display: 'block',
+  flexShrink: 0,
 });
 
 

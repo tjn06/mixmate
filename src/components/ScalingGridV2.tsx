@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react'
+import { Trash2 } from 'lucide-react'
 import * as styles from './ScalingGridV2.css'
 
 type BinderKey = 'A' | 'B' | 'C' | 'D'
@@ -568,6 +569,28 @@ export function ScalingGridV2() {
   );
 }
 
+function CardDeleteButton({
+  label,
+  disabled = false,
+  onClick,
+}: Readonly<{
+  label: string
+  disabled?: boolean
+  onClick: () => void
+}>) {
+  return (
+    <button
+      type="button"
+      className={styles.resultCardDeleteButton}
+      disabled={disabled}
+      aria-label={`Ta bort ${label}`}
+      onClick={onClick}
+    >
+      <Trash2 className={styles.resultCardDeleteIcon} size={13} strokeWidth={1.75} aria-hidden="true" />
+    </button>
+  )
+}
+
 function ControlBinderCard({
   item,
   canDelete,
@@ -582,16 +605,12 @@ function ControlBinderCard({
   return (
     <article className={styles.resultCard}>
       <div className={styles.resultCardHeader}>
-        <span className={styles.resultLabel}>{item.label}</span>
-        <button
-          type="button"
-          className={styles.resultCardDeleteButton}
+        <span className={styles.resultCardHeaderTitle}>{item.label}</span>
+        <CardDeleteButton
+          label={item.label}
           disabled={!canDelete}
-          aria-label={`Ta bort ${item.label}`}
           onClick={() => onDelete(item.id)}
-        >
-          ×
-        </button>
+        />
       </div>
       <input
         className={styles.ratioValueInput}
@@ -604,7 +623,7 @@ function ControlBinderCard({
           onValueChange(item.id, nextValue);
         }}
       />
-      <span className={styles.resultUnit}>{item.unit}</span>
+      <span className={styles.resultUnit}>{item.nameUnit}</span>
     </article>
   );
 }
@@ -621,15 +640,8 @@ function ControlAdditiveCard({
   return (
     <article className={styles.resultCard}>
       <div className={styles.resultCardHeader}>
-        <span className={styles.resultLabel}>{item.nameUnit}</span>
-        <button
-          type="button"
-          className={styles.resultCardDeleteButton}
-          aria-label={`Ta bort ${item.nameUnit}`}
-          onClick={() => onDelete(item.id)}
-        >
-          ×
-        </button>
+        <span className={styles.resultCardHeaderTitle}>{item.nameUnit}</span>
+        <CardDeleteButton label={item.nameUnit} onClick={() => onDelete(item.id)} />
       </div>
       <input
         className={styles.ratioValueInput}
