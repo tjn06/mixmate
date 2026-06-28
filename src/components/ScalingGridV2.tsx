@@ -1,5 +1,4 @@
 import { Fragment, useState } from 'react'
-import type { ReactNode } from 'react'
 import * as styles from './ScalingGridV2.css'
 
 type BinderKey = 'A' | 'B' | 'C' | 'D'
@@ -172,6 +171,7 @@ function RecipeSelectControl({
       id="recipe-select"
       label="Recept"
       value={value}
+      placeholder="Recept"
       options={recipeOptions}
       placement="down"
       onChange={onChange}
@@ -193,6 +193,7 @@ function KnownWeightModeSelectControl({
       id="known-weight-mode-select"
       label="Vad anger vikten?"
       value={value}
+      placeholder="Vad anger vikten?"
       options={getKnownWeightModeOptions(binders)}
       placement="down"
       onChange={onChange}
@@ -346,18 +347,6 @@ function ResultRowsGrid({
   )
 }
 
-/* function ControlRowsGrid({
-  children,
-}: Readonly<{
-  children: ReactNode
-}>) {
-  return <div className={styles.controlRowsGrid}>
-    <div className={styles.binderControlFourColumnsRow}>
-      {children}
-    </div>
-  </div>
-} */
-
 export function ScalingGridV2() {
   const [knownWeightMode, setKnownWeightMode] = useState<KnownWeightMode>('visibleBindersTotal')
   const [knownWeight, setKnownWeight] = useState<string>('15')
@@ -507,19 +496,6 @@ export function ScalingGridV2() {
               />
             </section>
 
-            {/*             <section className={styles.binderRatioArea} aria-label="Bindare">
-              <RatioMaxFourGrid emptyLabel="Inga bindare">
-                {binders.map((item) => (
-                  <RatioControlBinder
-                    key={item.id}
-                    item={item}
-                    onValueChange={updateBinderValue}
-                    onDelete={deleteBinder}
-                  />
-                ))}
-              </RatioMaxFourGrid>
-            </section> */}
-
             <section className={styles.binderRatioArea} aria-label="Bindare">
               <div className={styles.controlRowsGrid}>
                 {binders.length === 0 ? (
@@ -630,7 +606,7 @@ function ControlBinderCard({
           onValueChange(item.id, nextValue);
         }}
       />
-      <span className={styles.resultUnit}>{item.nameUnit}</span>
+      <span className={styles.resultUnit}>{item.unit}</span>
     </article>
   );
 }
@@ -679,112 +655,6 @@ function ResultCard({ item }: Readonly<{ item: ResultItem }>) {
       <span className={styles.resultLabel}>{item.label}</span>
       <strong className={styles.resultValue}>{item.value}</strong>
       <span className={styles.resultUnit}>{item.unit}</span>
-    </article>
-  )
-}
-
-function RatioMaxFourGrid({
-  children,
-  emptyLabel,
-}: Readonly<{
-  children: ReactNode
-  emptyLabel: string
-}>) {
-  return (
-    <div className={styles.ratioMaxFourGrid}>
-      {children || (
-        <div className={styles.ratioEmptyState} aria-hidden="true">
-          {emptyLabel}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function RatioControlBinder({
-  item,
-  onValueChange,
-  onDelete,
-}: Readonly<{
-  item: RatioItem
-  onValueChange: (id: string, value: string) => void
-  onDelete: (id: string) => void
-}>) {
-  return (
-    <article className={styles.ratioControlThreeColumns}>
-      {/*       <button className={styles.ratioLabelSegment} type="button">
-        {item.label}
-      </button> */}
-
-      <input
-        className={styles.ratioValueInput}
-        value={item.value}
-        inputMode="numeric"
-        pattern="[0-9]*"
-        aria-label={`${item.label} ${item.unit}`}
-        onChange={(event) => {
-          const nextValue = event.currentTarget.value.replace(/\D/g, '')
-          onValueChange(item.id, nextValue)
-        }}
-      />
-
-      <button className={styles.ratioUnitSegment} type="button">
-        {item.unit}
-      </button>
-
-      <button
-        className={styles.ratioDeleteSegment}
-        type="button"
-        disabled={!item.removable}
-        aria-label={`Ta bort ${item.label}`}
-        onClick={() => onDelete(item.id)}
-      >
-        ×
-      </button>
-    </article>
-  )
-}
-
-function RatioControlAdditive({
-  item,
-  onValueChange,
-  onDelete,
-}: Readonly<{
-  item: RatioItem
-  onValueChange: (id: string, value: string) => void
-  onDelete: (id: string) => void
-}>) {
-  return (
-    <article className={styles.ratioControlThreeColumns}>
-      {/*       <button className={styles.ratioLabelSegment} type="button">
-        {item.label}
-      </button> */}
-
-      <input
-        className={styles.ratioValueInput}
-        value={item.value}
-        inputMode="numeric"
-        pattern="[0-9]*"
-        aria-label={`${item.label} ${item.unit}`}
-        onChange={(event) => {
-          const nextValue = event.currentTarget.value.replace(/\D/g, '')
-          onValueChange(item.id, nextValue)
-        }}
-      />
-
-      <button className={styles.ratioUnitSegment} type="button">
-        {item.unit}
-      </button>
-
-      <button
-        className={styles.ratioDeleteSegment}
-        type="button"
-        disabled={!item.removable}
-        aria-label={`Ta bort ${item.label}`}
-        onClick={() => onDelete(item.id)}
-      >
-        ×
-      </button>
     </article>
   )
 }

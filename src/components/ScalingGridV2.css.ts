@@ -745,22 +745,22 @@ export const appSelectRoot = style({
   });
   
   export const appSelectTrigger = style([
-    controlBase,
+    selectActionControl,
     {
-      display: 'grid',
-      gridTemplateColumns: 'minmax(0, 1fr) auto',
+      position: 'relative',
+      display: 'flex',
       alignItems: 'center',
-      gap: controlGap,
-  
-      background: '#ffffff',
-      color: '#111',
-      textAlign: 'left',
+      justifyContent: 'center',
+      textAlign: 'center',
     },
   ]);
   
   export const appSelectTriggerText = style({
     minWidth: 0,
     maxWidth: '100%',
+    width: '100%',
+  
+    textAlign: 'center',
   
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -768,6 +768,10 @@ export const appSelectRoot = style({
   });
   
   export const appSelectChevron = style({
+    position: 'absolute',
+    right: controlPaddingX,
+    top: '50%',
+    transform: 'translateY(-50%)',
     fontSize: fontSm,
     lineHeight: 1.15,
     opacity: 0.75,
@@ -799,33 +803,16 @@ export const appSelectRoot = style({
     bottom: `calc(100% + ${appGap})`,
   });
   
-  export const appSelectOption = style({
-    width: '100%',
-    minWidth: 0,
-    minHeight: 'clamp(34px, min(9cqw, 5cqh), 48px)',
+  export const appSelectOption = style([
+    selectActionControl,
+    {
+      textAlign: 'center',
   
-    border: 0,
-    borderRadius: radiusSm,
-  
-    paddingInline: controlPaddingX,
-  
-    background: '#eeeeee',
-    color: '#111',
-  
-    fontSize: fontMd,
-    lineHeight: 1.15,
-    fontWeight: 750,
-  
-    textAlign: 'left',
-  
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  
-    selectors: {
-      '&[aria-selected="true"]': {
-        background: '#111',
-        color: '#ffffff',
+      selectors: {
+        '&[aria-selected="true"]': {
+          background: '#ffffff',
+          color: '#111',
+        },
       },
     },
-  });
+  ]);
