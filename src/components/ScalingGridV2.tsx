@@ -484,9 +484,7 @@ export function ScalingGridV2() {
                 onChange={(event) => setKnownWeight(event.currentTarget.value)}
               />
 
-              <button className={styles.weightUnitControl} type="button">
-                kg
-              </button>
+              <span className={styles.weightUnitLabel}>kg</span>
             </section>
 
             <section className={styles.recipeArea} aria-label="Recept">

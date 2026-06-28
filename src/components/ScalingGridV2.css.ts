@@ -262,6 +262,32 @@ const controlBase = style({
   textOverflow: 'ellipsis',
 });
 
+const inputControlBase = style({
+  minWidth: 0,
+  minHeight: 0,
+  width: '100%',
+  height: '100%',
+
+  border: '2px solid #dcdcdc',
+  borderRadius: radiusMd,
+  paddingInline: controlPaddingX,
+
+  background: '#ffffff',
+  color: '#111',
+
+  fontSize: fontMd,
+  lineHeight: 1.15,
+  fontWeight: 750,
+  textAlign: 'center',
+
+  selectors: {
+    '&:focus': {
+      outline: 'none',
+      borderColor: '#111',
+    },
+  },
+});
+
 export const resultDisclosureControl = style([
   controlBase,
   {
@@ -279,22 +305,21 @@ export const fullRowSelectControl = style([
   },
 ]);
 
-export const weightInputControl = style([
-  controlBase,
-  {
-    background: '#ffffff',
-    color: '#111',
-    textAlign: 'center',
-  },
-]);
+export const weightInputControl = style([inputControlBase]);
 
-export const weightUnitControl = style([
-  controlBase,
-  {
-    background: '#111',
-    color: '#ffffff',
-  },
-]);
+export const weightUnitLabel = style({
+  minWidth: 0,
+  height: '100%',
+
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+
+  fontSize: fontMd,
+  lineHeight: 1.15,
+  fontWeight: 750,
+  color: '#111',
+});
 
 export const selectActionControl = style([
   controlBase,
@@ -696,15 +721,12 @@ export const ratioLabelSegment = style([
 ]);
 
 export const ratioValueInput = style([
-    ratioSegmentBase,
-    {
-      background: '#111',
-      color: '#ffffff',
-      fontSize: fontMd,
-      textAlign: 'center',
-      padding: 0,
-    },
-  ]);
+  inputControlBase,
+  {
+    borderRadius: radiusSm,
+    padding: 0,
+  },
+]);
 
 export const ratioUnitSegment = style([
   ratioSegmentBase,
