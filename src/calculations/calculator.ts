@@ -1,15 +1,13 @@
-export type CalcMode = "totalWithAdditives" | "binder" | "component"
+export type CalcMode = 'totalWithAdditives' | 'binder' | 'component'
 
 export type BinderComponent = {
   id: string
   name: string
   parts: number
-  color: "blue" | "green" | "gray"
+  color: 'blue' | 'green' | 'gray'
 }
 
-export type AdditiveType = "sand" | "water"| "thixotrope" | "custom"
-
-
+export type AdditiveType = 'sand' | 'water' | 'thixotrope' | 'custom'
 
 export type RecipeAdditive = {
   id: string
@@ -22,8 +20,8 @@ export type ResultItem = {
   id: string
   name: string
   weight: number
-  color: "blue" | "green" | "gray"
-  kind: "binder" | "additive"
+  color: 'blue' | 'green' | 'gray'
+  kind: 'binder' | 'additive'
   parts?: number
 }
 
@@ -37,7 +35,7 @@ export type CalculationResult = {
 }
 
 export function formatKg(value: number): string {
-  return value.toFixed(2).replace(".", ",")
+  return value.toFixed(2).replace('.', ',')
 }
 
 export function calculateMix(params: {
@@ -54,23 +52,22 @@ export function calculateMix(params: {
   const totalParts = binders.reduce((sum, item) => sum + item.parts, 0)
   if (totalParts <= 0) return null
 
-  const additiveFactor =
-    1 + additives.reduce((sum, item) => sum + item.percentOfBinder / 100, 0)
+  const additiveFactor = 1 + additives.reduce((sum, item) => sum + item.percentOfBinder / 100, 0)
 
   let binderWeight = knownWeight
   let weightPerPart = 0
 
-  if (mode === "totalWithAdditives") {
+  if (mode === 'totalWithAdditives') {
     binderWeight = knownWeight / additiveFactor
     weightPerPart = binderWeight / totalParts
   }
 
-  if (mode === "binder") {
+  if (mode === 'binder') {
     binderWeight = knownWeight
     weightPerPart = binderWeight / totalParts
   }
 
-  if (mode === "component") {
+  if (mode === 'component') {
     const knownComponent = binders.find((item) => item.id === knownComponentId)
     if (!knownComponent || knownComponent.parts <= 0) return null
 
@@ -82,7 +79,7 @@ export function calculateMix(params: {
     id: item.id,
     name: item.name,
     color: item.color,
-    kind: "binder",
+    kind: 'binder',
     parts: item.parts,
     weight: item.parts * weightPerPart,
   }))
@@ -90,22 +87,21 @@ export function calculateMix(params: {
   const additiveItems: ResultItem[] = additives.map((item) => ({
     id: item.id,
     name: item.name,
-    color: "gray",
-    kind: "additive",
+    color: 'gray',
+    kind: 'additive',
     weight: binderWeight * (item.percentOfBinder / 100),
   }))
 
-  const totalWeight =
-    binderWeight + additiveItems.reduce((sum, item) => sum + item.weight, 0)
+  const totalWeight = binderWeight + additiveItems.reduce((sum, item) => sum + item.weight, 0)
 
   return {
     binderItems,
     additiveItems,
     binderWeight,
     totalWeight,
-    calculatedAt: new Date().toLocaleTimeString("sv-SE"),
+    calculatedAt: new Date().toLocaleTimeString('sv-SE'),
     steps: [
-      `Totala bindardelar = ${binders.map((b) => b.parts).join(" + ")} = ${totalParts}`,
+      `Totala bindardelar = ${binders.map((b) => b.parts).join(' + ')} = ${totalParts}`,
       `Bindare = ${formatKg(binderWeight)} kg`,
       `Vikt per del = ${formatKg(weightPerPart)} kg`,
       ...binderItems.map((item) => `${item.name} = ${formatKg(item.weight)} kg`),

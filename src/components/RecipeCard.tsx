@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { useCalculatorStore } from "../store/calculatorStore"
+import { useState } from 'react'
+import { useCalculatorStore } from '../store/calculatorStore'
 
 export function RecipeCard() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -23,7 +23,7 @@ export function RecipeCard() {
     removeAdditive,
   } = useCalculatorStore()
 
-  function handleAdditive(type: "sand" | "water" | "thixotrope" | "custom") {
+  function handleAdditive(type: 'sand' | 'water' | 'thixotrope' | 'custom') {
     addAdditive(type)
     setMenuOpen(false)
   }
@@ -41,15 +41,10 @@ export function RecipeCard() {
           className="select"
           value={selectedRecipeId}
           onChange={(event) =>
-            selectRecipe(
-              event.target.value as
-                | "custom"
-                | "repair-standard"
-                | "sockel-fas"
-            )
+            selectRecipe(event.target.value as 'custom' | 'repair-standard' | 'sockel-fas')
           }
         >
-          <option value="custom">Valfri</option>
+          <option value="custom">✏️ Valfri</option>
           <option value="repair-standard">🔒 Lagning standard</option>
           <option value="sockel-fas">🔒 Sockel / Fas</option>
         </select>
@@ -105,9 +100,7 @@ export function RecipeCard() {
             <input
               value={item.percentOfBinder}
               disabled={recipeLocked}
-              onChange={(event) =>
-                setAdditivePercent(item.id, event.target.value)
-              }
+              onChange={(event) => setAdditivePercent(item.id, event.target.value)}
             />
 
             <span>%</span>
@@ -125,23 +118,16 @@ export function RecipeCard() {
 
       {!recipeLocked && (
         <div className="additive-menu-wrap">
-          <button
-            className="outline-button"
-            onClick={() => setMenuOpen((open) => !open)}
-          >
+          <button className="outline-button" onClick={() => setMenuOpen((open) => !open)}>
             + Tillägg
           </button>
 
           {menuOpen && (
             <div className="additive-menu">
-              <button onClick={() => handleAdditive("sand")}>Sand</button>
-              <button onClick={() => handleAdditive("water")}>Vatten</button>
-              <button onClick={() => handleAdditive("thixotrope")}>
-                Tixotrop
-              </button>
-              <button onClick={() => handleAdditive("custom")}>
-                Nytt tillägg
-              </button>
+              <button onClick={() => handleAdditive('sand')}>Sand</button>
+              <button onClick={() => handleAdditive('water')}>Vatten</button>
+              <button onClick={() => handleAdditive('thixotrope')}>Tixotrop</button>
+              <button onClick={() => handleAdditive('custom')}>Nytt tillägg</button>
             </div>
           )}
         </div>

@@ -1,5 +1,5 @@
-import { formatKg, type CalculationResult } from "../calculations/calculator"
-import { useCalculatorStore } from "../store/calculatorStore"
+import { formatKg, type CalculationResult } from '../calculations/calculator'
+import { useCalculatorStore } from '../store/calculatorStore'
 
 type Props = {
   result: CalculationResult

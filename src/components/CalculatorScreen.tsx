@@ -13,6 +13,10 @@ function getInputLabel(mode: string, componentName?: string) {
 function getModeTitle(mode: string) {
   if (mode === "totalWithAdditives") return "Total vikt med tillägg"
   if (mode === "binder") return "Färdig mängd epoxy A+B"
+  if (mode === "componentA") return "Vikt på komponent A"
+  if (mode === "componentB") return "Vikt på komponent B"
+  if (mode === "componentC") return "Vikt på komponent C"
+  if (mode === "componentD") return "Vikt på komponent D"
   return "Vikt på komponent"
 }
 
@@ -47,7 +51,7 @@ export function CalculatorScreen() {
     return () => observer.disconnect()
   }, [])
 
-  const showSticky = result && !originalVisible && !stickyDismissed
+  /* const showSticky = result && !originalVisible && !stickyDismissed */
 
   return (
     <main className="app">
@@ -91,7 +95,7 @@ export function CalculatorScreen() {
 
       <RecipeCard />
 
-      {showSticky && result && <StickyResult result={result} />}
+      {/* {showSticky && result && <StickyResult result={result} />} */}
     </main>
   )
 }

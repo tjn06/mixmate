@@ -1,5 +1,5 @@
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import {
   calculateMix,
   type AdditiveType,
@@ -7,10 +7,10 @@ import {
   type CalcMode,
   type CalculationResult,
   type RecipeAdditive,
-} from "../calculations/calculator"
+} from '../calculations/calculator'
 
-type Screen = "start" | "calculator"
-type RecipeId = "custom" | "repair-standard" | "sockel-fas"
+type Screen = 'start' | 'calculator'
+type RecipeId = 'custom' | 'repair-standard' | 'sockel-fas'
 
 type RecipePreset = {
   id: RecipeId
@@ -60,60 +60,58 @@ type CalculatorStore = {
 }
 
 function toNumber(value: string | number): number {
-  return Number(String(value).replace(",", ".")) || 0
+  return Number(String(value).replace(',', '.')) || 0
 }
 
 function createId() {
   return crypto.randomUUID()
 }
 
-const colors: BinderComponent["color"][] = ["blue", "green", "gray"]
+const colors: BinderComponent['color'][] = ['blue', 'green', 'gray']
 
 function defaultBinders(): BinderComponent[] {
   return [
-    { id: "a", name: "A", parts: 2, color: "blue" },
-    { id: "b", name: "B", parts: 1, color: "green" },
+    { id: 'a', name: 'A', parts: 2, color: 'blue' },
+    { id: 'b', name: 'B', parts: 1, color: 'green' },
   ]
 }
 
 function defaultAdditives(): RecipeAdditive[] {
-  return [{ id: "sand", type: "sand", name: "Sand", percentOfBinder: 550 }]
+  return [{ id: 'sand', type: 'sand', name: 'Sand', percentOfBinder: 550 }]
 }
 
 const RECIPE_PRESETS: RecipePreset[] = [
   {
-    id: "custom",
-    name: "Valfri",
+    id: 'custom',
+    name: 'Valfri',
     locked: false,
     binders: defaultBinders(),
     additives: defaultAdditives(),
   },
   {
-    id: "repair-standard",
-    name: "Lagning standard",
+    id: 'repair-standard',
+    name: 'Lagning standard',
     locked: true,
     binders: [
-      { id: "a", name: "A", parts: 2, color: "blue" },
-      { id: "b", name: "B", parts: 1, color: "green" },
+      { id: 'a', name: 'A', parts: 2, color: 'blue' },
+      { id: 'b', name: 'B', parts: 1, color: 'green' },
     ],
-    additives: [
-      { id: "sand", type: "sand", name: "Sand", percentOfBinder: 555 },
-    ],
+    additives: [{ id: 'sand', type: 'sand', name: 'Sand', percentOfBinder: 555 }],
   },
   {
-    id: "sockel-fas",
-    name: "Sockel / Fas",
+    id: 'sockel-fas',
+    name: 'Sockel / Fas',
     locked: true,
     binders: [
-      { id: "a", name: "A", parts: 2, color: "blue" },
-      { id: "b", name: "B", parts: 1, color: "green" },
+      { id: 'a', name: 'A', parts: 2, color: 'blue' },
+      { id: 'b', name: 'B', parts: 1, color: 'green' },
     ],
     additives: [
-      { id: "sand", type: "sand", name: "Sand", percentOfBinder: 445 },
+      { id: 'sand', type: 'sand', name: 'Sand', percentOfBinder: 445 },
       {
-        id: "thixotrope",
-        type: "thixotrope",
-        name: "Tixotrop",
+        id: 'thixotrope',
+        type: 'thixotrope',
+        name: 'Tixotrop',
         percentOfBinder: 5,
       },
     ],
@@ -133,25 +131,25 @@ function getPreset(recipeId: RecipeId) {
 }
 
 function defaultKnownWeight(mode: CalcMode) {
-  if (mode === "component") return "2,50"
-  if (mode === "totalWithAdditives") return "45,50"
-  return "7,00"
+  if (mode === 'component') return '2,50'
+  if (mode === 'totalWithAdditives') return '45,50'
+  return '7,00'
 }
 
 function createAdditive(type: AdditiveType): RecipeAdditive {
-  if (type === "sand") {
-    return { id: createId(), type, name: "Sand", percentOfBinder: 550 }
+  if (type === 'sand') {
+    return { id: createId(), type, name: 'Sand', percentOfBinder: 550 }
   }
 
-  if (type === "water") {
-    return { id: createId(), type, name: "Vatten", percentOfBinder: 0 }
+  if (type === 'water') {
+    return { id: createId(), type, name: 'Vatten', percentOfBinder: 0 }
   }
 
-  if (type === "thixotrope") {
-    return { id: createId(), type, name: "Tixotrop", percentOfBinder: 5 }
+  if (type === 'thixotrope') {
+    return { id: createId(), type, name: 'Tixotrop', percentOfBinder: 5 }
   }
 
-  return { id: createId(), type, name: "Tillägg", percentOfBinder: 0 }
+  return { id: createId(), type, name: 'Tillägg', percentOfBinder: 0 }
 }
 
 function getResult(state: {
@@ -171,7 +169,7 @@ function getResult(state: {
 }
 
 function resetForMode(mode: CalcMode) {
-  const preset = getPreset("custom")
+  const preset = getPreset('custom')
   const binders = cloneBinders(preset.binders)
   const additives = cloneAdditives(preset.additives)
   const knownWeight = defaultKnownWeight(mode)
@@ -222,15 +220,15 @@ function loadRecipe(state: CalculatorStore, recipeId: RecipeId) {
 export const useCalculatorStore = create<CalculatorStore>()(
   persist(
     (set) => ({
-      screen: "start",
-      mode: "binder",
+      screen: 'start',
+      mode: 'binder',
       rememberLastScreen: false,
 
-      selectedRecipeId: "custom",
+      selectedRecipeId: 'custom',
       recipeLocked: false,
 
-      knownWeight: "7,00",
-      knownComponentId: "a",
+      knownWeight: '7,00',
+      knownComponentId: 'a',
 
       binders: defaultBinders(),
       additives: defaultAdditives(),
@@ -240,14 +238,14 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
       startCalculation: (mode) =>
         set({
-          screen: "calculator",
+          screen: 'calculator',
           ...resetForMode(mode),
         }),
 
       goToStart: () =>
         set({
-          screen: "start",
-          ...resetForMode("binder"),
+          screen: 'start',
+          ...resetForMode('binder'),
         }),
 
       toggleRememberLastScreen: () =>
@@ -342,12 +340,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
           if (state.recipeLocked || state.binders.length <= 2) return state
 
           const binders = state.binders.filter((item) => item.id !== binderId)
-          const knownStillExists = binders.some(
-            (item) => item.id === state.knownComponentId
-          )
-          const knownComponentId = knownStillExists
-            ? state.knownComponentId
-            : binders[0].id
+          const knownStillExists = binders.some((item) => item.id === state.knownComponentId)
+          const knownComponentId = knownStillExists ? state.knownComponentId : binders[0].id
 
           const nextState = { ...state, binders, knownComponentId }
 
@@ -381,9 +375,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
           if (state.recipeLocked) return state
 
           const additives = state.additives.map((item) =>
-            item.id === additiveId
-              ? { ...item, percentOfBinder: toNumber(value) }
-              : item
+            item.id === additiveId ? { ...item, percentOfBinder: toNumber(value) } : item
           )
 
           const nextState = { ...state, additives }
@@ -413,9 +405,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
         set((state) => {
           if (state.recipeLocked) return state
 
-          const additives = state.additives.filter(
-            (item) => item.id !== additiveId
-          )
+          const additives = state.additives.filter((item) => item.id !== additiveId)
 
           const nextState = { ...state, additives }
 
@@ -429,9 +419,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
       dismissSticky: () => set({ stickyDismissed: true }),
     }),
     {
-      name: "epoxy-calc-navigation-v1",
+      name: 'epoxy-calc-navigation-v1',
       partialize: (state) => ({
-        screen: state.rememberLastScreen ? state.screen : "start",
+        screen: state.rememberLastScreen ? state.screen : 'start',
         mode: state.mode,
         rememberLastScreen: state.rememberLastScreen,
       }),
