@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from "react"
 import { useCalculatorStore } from "../store/calculatorStore"
 import { RecipeCard } from "./RecipeCard"
 import { ResultPanel } from "./ResultPanel"
-import { StickyResult } from "./StickyResult"
 
 function getInputLabel(mode: string, componentName?: string) {
   if (mode === "totalWithAdditives") return "Total vikt med tillägg"
@@ -21,37 +19,18 @@ function getModeTitle(mode: string) {
 }
 
 export function CalculatorScreen() {
-  const resultRef = useRef<HTMLDivElement | null>(null)
-  const [originalVisible, setOriginalVisible] = useState(true)
-
   const {
     mode,
     knownWeight,
     knownComponentId,
     binders,
     result,
-    stickyDismissed,
     goToStart,
     setKnownWeight,
     setKnownComponentId,
   } = useCalculatorStore()
 
   const selectedComponent = binders.find((item) => item.id === knownComponentId)
-
-  useEffect(() => {
-    const element = resultRef.current
-    if (!element) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => setOriginalVisible(entry.isIntersecting),
-      { threshold: 0.2 }
-    )
-
-    observer.observe(element)
-    return () => observer.disconnect()
-  }, [])
-
-  /* const showSticky = result && !originalVisible && !stickyDismissed */
 
   return (
     <main className="app">
@@ -63,9 +42,7 @@ export function CalculatorScreen() {
         <button className="icon-button">⋮</button>
       </header>
 
-      <div ref={resultRef}>
-        <ResultPanel result={result} />
-      </div>
+      <ResultPanel result={result} />
 
       <section className="section">
         <h2>{getInputLabel(mode, selectedComponent?.name)}</h2>
@@ -94,8 +71,6 @@ export function CalculatorScreen() {
       </section>
 
       <RecipeCard />
-
-      {/* {showSticky && result && <StickyResult result={result} />} */}
     </main>
   )
 }

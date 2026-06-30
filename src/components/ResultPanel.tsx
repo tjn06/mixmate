@@ -1,5 +1,4 @@
 import { formatKg, type CalculationResult } from '../calculations/calculator'
-import { PopUp } from './overlays/PopUp'
 
 type Props = {
   result: CalculationResult | null
@@ -11,7 +10,7 @@ export function ResultPanel({ result }: Props) {
       <div className="report-top">
         <details className="details">
           <summary>Visa exakt uträkning</summary>
-          {result.steps.map((step, index) => (
+          {result?.steps.map((step, index) => (
             <p key={index}>{step}</p>
           ))}
         </details>

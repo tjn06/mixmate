@@ -44,8 +44,6 @@ type ResultItem = Readonly<{
   removable: boolean
 }>
 
-const binderKeys = ['A', 'B', 'C', 'D'] as const satisfies readonly BinderKey[]
-
 const initialBinders: readonly RatioItem[] = [
   {
     id: 'binder-a',
@@ -116,18 +114,6 @@ function getKnownWeightModeOptions(
       label: `Vikt på komponent ${binder.label}`,
     })),
   ]
-}
-
-function isBinderKey(value: string): value is BinderKey {
-  return binderKeys.includes(value as BinderKey)
-}
-
-function isRecipeId(value: string): value is RecipeId {
-  return value === 'custom' || value === 'repair-standard' || value === 'sockel-fas'
-}
-
-function isAdditiveKind(value: string): value is AdditiveKind {
-  return value === 'sand' || value === 'water' || value === 'thixotrope' || value === 'custom'
 }
 
 function getBinderLabelClass(label: string): string {

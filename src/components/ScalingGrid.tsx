@@ -28,42 +28,48 @@ export function ScalingGrid() {
         <header className={styles.header}>Calculator</header>
 
         <div className={styles.results}>
-          <details className={styles.details}>
-            <summary>Visa exakt uträkning</summary>
-            {result.steps.map((step, index) => (
-              <p key={index}>{step}</p>
-            ))}
-          </details>
+          {result ? (
+            <>
+              <details className={styles.details}>
+                <summary>Visa exakt uträkning</summary>
+                {result.steps.map((step, index) => (
+                  <p key={index}>{step}</p>
+                ))}
+              </details>
 
-          <div className={styles.resultRow}>
-            {result.binderItems.map((item) => (
-              <div className={styles.resultCard} key={item.id}>
-                <span className={styles.resultLabel}>{item.name}</span>
-                <strong className={styles.resultValue}>{item.weight}</strong>
-                <span className={styles.resultUnit}>kg</span>
+              <div className={styles.resultRow}>
+                {result.binderItems.map((item) => (
+                  <div className={styles.resultCard} key={item.id}>
+                    <span className={styles.resultLabel}>{item.name}</span>
+                    <strong className={styles.resultValue}>{item.weight}</strong>
+                    <span className={styles.resultUnit}>kg</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          <div className={styles.resultRow}>
-            {result.additiveItems.map((item) => (
-              <div className={styles.resultCard} key={item.id}>
-                <span className={styles.resultLabel}>{item.name}</span>
-                <strong className={styles.resultValue}>{item.weight}</strong>
-                <span className={styles.resultUnit}>kg</span>
+              <div className={styles.resultRow}>
+                {result.additiveItems.map((item) => (
+                  <div className={styles.resultCard} key={item.id}>
+                    <span className={styles.resultLabel}>{item.name}</span>
+                    <strong className={styles.resultValue}>{item.weight}</strong>
+                    <span className={styles.resultUnit}>kg</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          <div className={styles.resultRow}>
-            <div className={styles.resultCard}>
-              <span className={styles.resultLabel}>Totalt</span>
-              <strong className={styles.resultValue}>
-                {formatKg(result.totalWeight)}
-              </strong>
-              <span className={styles.resultUnit}>kg</span>
-            </div>
-          </div>
+              <div className={styles.resultRow}>
+                <div className={styles.resultCard}>
+                  <span className={styles.resultLabel}>Totalt</span>
+                  <strong className={styles.resultValue}>
+                    {formatKg(result.totalWeight)}
+                  </strong>
+                  <span className={styles.resultUnit}>kg</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p>Fyll i vikt för att visa resultat.</p>
+          )}
         </div>
 
         <div className={styles.buttons}>
