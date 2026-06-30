@@ -10,7 +10,7 @@ import {
 } from '../calculations/calculator'
 
 type Screen = 'start' | 'calculator'
-type RecipeId = 'custom' | 'repair-standard' | 'sockel-fas'
+export type RecipeId = 'custom' | 'repair-standard' | 'sockel-fas'
 
 type RecipePreset = {
   id: RecipeId
@@ -128,6 +128,20 @@ function cloneAdditives(additives: RecipeAdditive[]): RecipeAdditive[] {
 
 function getPreset(recipeId: RecipeId) {
   return RECIPE_PRESETS.find((recipe) => recipe.id === recipeId) ?? RECIPE_PRESETS[0]
+}
+
+export function loadRecipePreset(recipeId: RecipeId): {
+  recipeLocked: boolean
+  binders: BinderComponent[]
+  additives: RecipeAdditive[]
+} {
+  const preset = getPreset(recipeId)
+
+  return {
+    recipeLocked: preset.locked,
+    binders: cloneBinders(preset.binders),
+    additives: cloneAdditives(preset.additives),
+  }
 }
 
 function defaultKnownWeight(mode: CalcMode) {

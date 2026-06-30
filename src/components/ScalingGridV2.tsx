@@ -1,6 +1,14 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import * as styles from './ScalingGridV2.css'
+import {
+  applyRecipePreset,
+  calcResultToDisplayItems,
+  computeMixResult,
+  getModeTitle,
+  sanitizeDecimalInput,
+  type RecipeId,
+} from './scalingGridV2Logic'
 
 type BinderKey = 'A' | 'B' | 'C' | 'D'
 
@@ -9,8 +17,6 @@ type AdditiveKind = 'sand' | 'water' | 'thixotrope' | 'custom'
 type RatioUnit = 'delar' | '%'
 
 type WeightUnit = 'kg'
-
-type RecipeId = 'custom' | 'repair-standard' | 'sockel-fas'
 
 type NameUnitBinder = 'bas' | 'härdare' | 'filler' | 'custom'
 
@@ -78,9 +84,9 @@ type AppSelectOption<Value extends string> = Readonly<{
 }>
 
 const recipeOptions = [
-  { value: 'custom', label: '✏️ Valfri' },
-  { value: 'repair-standard', label: '🔒 Lagning standard' },
-  { value: 'sockel-fas', label: '🔒 Sockel / Fas' },
+  { value: 'custom', label: '✏️ Valfri (Recept)' },
+  { value: 'repair-standard', label: '🔒 Standard lagning (Recept)' },
+  { value: 'sockel-fas', label: '🔒 Sockel / Fas (Recept)' },
 ] as const satisfies readonly AppSelectOption<RecipeId>[]
 
 
@@ -122,6 +128,19 @@ function isRecipeId(value: string): value is RecipeId {
 
 function isAdditiveKind(value: string): value is AdditiveKind {
   return value === 'sand' || value === 'water' || value === 'thixotrope' || value === 'custom'
+}
+
+function getBinderLabelClass(label: string): string {
+  if (label === 'A') return styles.binderLabelA
+  if (label === 'B') return styles.binderLabelB
+  if (label === 'C') return styles.binderLabelC
+  if (label === 'D') return styles.binderLabelD
+  return styles.resultCardHeaderTitle
+}
+
+function getAdditiveLabelClass(nameUnit: string): string {
+  if (nameUnit === 'sand') return styles.additiveLabelSand
+  return styles.resultCardHeaderTitle
 }
 
 function canDeleteBinder(binder: RatioItem, binders: readonly RatioItem[]): boolean {
@@ -173,6 +192,7 @@ function RecipeSelectControl({
       label="Recept"
       value={value}
       placeholder="Recept"
+      listHeading="Recept"
       options={recipeOptions}
       placement="down"
       onChange={onChange}
@@ -205,16 +225,18 @@ function KnownWeightModeSelectControl({
 function AdditiveSelectControl({
   additives,
   onChange,
+  disabled = false,
 }: Readonly<{
   additives: readonly RatioItem[]
   onChange: (value: AdditiveKind) => void
+  disabled?: boolean
 }>) {
   const usedKinds = new Set(additives.map((item) => item.nameUnit))
   const availableOptions = additiveOptions.filter((option) => !usedKinds.has(option.value))
 
-  if (availableOptions.length === 0) {
+  if (availableOptions.length === 0 || disabled) {
     return (
-      <button className={styles.selectActionControl} type="button" disabled>
+      <button className={styles.selectActionOutlineControl} type="button" disabled>
         + Tillägg
       </button>
     )
@@ -238,6 +260,7 @@ function AppSelect<Value extends string>({
   label,
   value,
   placeholder = 'Välj',
+  listHeading,
   options,
   placement,
   onChange,
@@ -246,6 +269,7 @@ function AppSelect<Value extends string>({
   label: string
   value: Value | null
   placeholder?: string
+  listHeading?: string
   options: readonly AppSelectOption<Value>[]
   placement: AppSelectPlacement
   onChange: (value: Value) => void
@@ -260,12 +284,12 @@ function AppSelect<Value extends string>({
 
   const panelClassName =
     placement === 'up'
-      ? `${styles.appSelectPanel} ${styles.appSelectPanelUp}`
-      : `${styles.appSelectPanel} ${styles.appSelectPanelDown}`
+      ? `${styles.appSelectPanel} ${styles.appSelectPanelUp} ${styles.appSelectPanelOpen}`
+      : `${styles.appSelectPanel} ${styles.appSelectPanelDown} ${styles.appSelectPanelOpen}`
 
   return (
     <div
-      className={styles.appSelectRoot}
+      className={`${styles.appSelectRoot} ${isOpen ? styles.appSelectRootOpen : ''}`}
       onBlur={(event) => {
         const nextTarget = event.relatedTarget
 
@@ -285,7 +309,7 @@ function AppSelect<Value extends string>({
       }}
     >
       <button
-        className={styles.appSelectTrigger}
+        className={`${styles.appSelectTrigger} ${isOpen ? styles.appSelectTriggerOpen : ''}`}
         type="button"
         aria-label={label}
         aria-haspopup="listbox"
@@ -294,13 +318,21 @@ function AppSelect<Value extends string>({
         onClick={() => setIsOpen((current) => !current)}
       >
         <span className={styles.appSelectTriggerText}>{displayValue}</span>
-        <span className={styles.appSelectChevron} aria-hidden="true">
+        <span
+          className={`${styles.appSelectChevron} ${isOpen ? styles.appSelectChevronOpen : ''}`}
+          aria-hidden="true"
+        >
           ▾
         </span>
       </button>
 
       {isOpen && (
         <div id={panelId} className={panelClassName} role="listbox" aria-label={label}>
+          {listHeading && (
+            <div className={styles.appSelectPanelHeading} aria-hidden="true">
+              {listHeading}
+            </div>
+          )}
           {options.map((option) => (
             <button
               key={option.value}
@@ -333,14 +365,14 @@ function ResultRowsGrid({
     <div className={styles.resultRowsGrid}>
       <div className={styles.binderResultRow}>
         {binderItems.map((item) => (
-          <ResultCard key={item.id} item={item} />
+          <ResultCard key={item.id} item={item} kind="binder" />
         ))}
       </div>
 
       {additiveItems.length > 0 && (
         <div className={styles.additiveResultRow}>
           {additiveItems.map((item) => (
-            <ResultCard key={item.id} item={item} />
+            <ResultCard key={item.id} item={item} kind="additive" />
           ))}
         </div>
       )}
@@ -350,21 +382,45 @@ function ResultRowsGrid({
 
 export function ScalingGridV2() {
   const [knownWeightMode, setKnownWeightMode] = useState<KnownWeightMode>('visibleBindersTotal')
-  const [knownWeight, setKnownWeight] = useState<string>('15')
+  const [knownWeight, setKnownWeight] = useState<string>('15,00')
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeId>('custom')
+  const [recipeLocked, setRecipeLocked] = useState<boolean>(false)
 
   const [binders, setBinders] = useState<readonly RatioItem[]>(initialBinders)
   const [additives, setAdditives] = useState<readonly RatioItem[]>(initialAdditives)
 
+  const result = useMemo(
+    () => computeMixResult({ knownWeightMode, knownWeight, binders, additives }),
+    [knownWeightMode, knownWeight, binders, additives]
+  )
+
+  const {
+    binderItems: binderResultItems,
+    additiveItems: additiveResultItems,
+    totalWeight,
+  } = useMemo(() => calcResultToDisplayItems(result), [result])
+
+  function handleRecipeChange(recipeId: RecipeId): void {
+    setSelectedRecipe(recipeId)
+
+    const preset = applyRecipePreset(recipeId)
+    setRecipeLocked(preset.recipeLocked)
+    setBinders(preset.binders as readonly RatioItem[])
+    setAdditives(preset.additives as readonly RatioItem[])
+  }
+
   function updateBinderValue(id: string, value: string): void {
+    if (recipeLocked) return
     setBinders((items) => items.map((item) => (item.id === id ? { ...item, value } : item)))
   }
 
   function updateAdditiveValue(id: string, value: string): void {
+    if (recipeLocked) return
     setAdditives((items) => items.map((item) => (item.id === id ? { ...item, value } : item)))
   }
 
   function addBinder(): void {
+    if (recipeLocked) return
     setBinders((currentBinders) => {
       const nextBinder = createNextBinder(currentBinders)
 
@@ -377,6 +433,7 @@ export function ScalingGridV2() {
   }
 
   function deleteBinder(id: string): void {
+    if (recipeLocked) return
     setBinders((currentBinders) => {
       const binder = currentBinders.find((item) => item.id === id)
 
@@ -389,6 +446,7 @@ export function ScalingGridV2() {
   }
 
   function addAdditive(kind: AdditiveKind): void {
+    if (recipeLocked) return
     setAdditives((currentAdditives) => {
       if (currentAdditives.length >= 4) {
         return currentAdditives
@@ -419,26 +477,9 @@ export function ScalingGridV2() {
   }
 
   function deleteAdditive(id: string): void {
+    if (recipeLocked) return
     setAdditives((currentAdditives) => currentAdditives.filter((item) => item.id !== id))
   }
-
-  const binderResultItems: readonly ResultItem[] = binders.map((binder) => ({
-    id: `result-${binder.id}`,
-    label: binder.label,
-    nameUnit: binder.nameUnit,
-    value: '10.0',
-    removable: false,
-    unit: 'kg',
-  }))
-
-  const additiveResultItems: readonly ResultItem[] = additives.map((additive) => ({
-    id: `result-${additive.id}`,
-    label: additive.label,
-    nameUnit: additive.nameUnit,
-    value: '5.0',
-    removable: true,
-    unit: 'kg',
-  }))
 
   return (
     <main className={styles.pageFrame}>
@@ -446,121 +487,140 @@ export function ScalingGridV2() {
         <div className={styles.appScrollLayer}>
           <div className={styles.calculatorGrid}>
             <header className={styles.headerArea}>
-              <h1 className={styles.appTitle}>Calculator</h1>
+              <h1 className={styles.appTitle}>{getModeTitle(knownWeightMode)}</h1>
             </header>
 
-            <section className={styles.resultsArea} aria-label="Resultat">
-              <button className={styles.resultDisclosureControl} type="button">
-                Visa exakt uträkning
-              </button>
-
-              <ResultRowsGrid
-                binderItems={binderResultItems}
-                additiveItems={additiveResultItems}
-              />
-
-              <article className={styles.totalResultCard}>
-                <span className={styles.resultLabel}>Totalt</span>
-                <strong className={styles.resultValue}>30.0</strong>
-                <span className={styles.resultUnit}>kg</span>
-              </article>
-            </section>
-
             <section
-              className={styles.knownComponentArea}
-              aria-label="Känd komponent"
+              className={styles.resultsSectionGroup}
+              aria-label="Resultat"
+              aria-readonly="true"
             >
-              <KnownWeightModeSelectControl
-                value={knownWeightMode}
-                binders={binders}
-                onChange={setKnownWeightMode}
-              />
+              <div className={styles.resultsSectionDisclosureSlot}>
+                <button className={styles.resultDisclosureControl} type="button">
+                  Visa exakt uträkning
+                </button>
+              </div>
+
+              <div className={styles.resultsSectionRowsSlot}>
+                <ResultRowsGrid
+                  binderItems={binderResultItems as readonly ResultItem[]}
+                  additiveItems={additiveResultItems as readonly ResultItem[]}
+                />
+              </div>
+
+              <div className={styles.resultsSectionTotalSlot}>
+                <article className={styles.resultOutputTotalCard}>
+                  <span className={styles.resultOutputLabel}>Totalt</span>
+                  <strong className={styles.resultOutputTotalValue}>{totalWeight}</strong>
+                  <span className={styles.resultOutputUnit}>kg</span>
+                </article>
+              </div>
             </section>
 
-            <section className={styles.knownWeightArea} aria-label="Känd vikt">
-              <input
-                className={styles.weightInputControl}
-                value={knownWeight}
-                inputMode="decimal"
-                onChange={(event) => setKnownWeight(event.currentTarget.value)}
-              />
-
-              <span className={styles.weightUnitLabel}>kg</span>
+            <section className={styles.recipeSectionGroup} aria-label="Recept">
+              <div className={styles.recipeSectionSelectSlot}>
+                <RecipeSelectControl
+                  value={selectedRecipe}
+                  onChange={handleRecipeChange}
+                />
+              </div>
             </section>
 
-            <section className={styles.recipeArea} aria-label="Recept">
-              <RecipeSelectControl
-                value={selectedRecipe}
-                onChange={setSelectedRecipe}
-              />
+            <section className={styles.knownInputGroup} aria-label="Känd mängd">
+              <div className={styles.knownInputGroupSelectSlot}>
+                <KnownWeightModeSelectControl
+                  value={knownWeightMode}
+                  binders={binders}
+                  onChange={setKnownWeightMode}
+                />
+              </div>
+
+              <div className={styles.knownInputGroupWeightRow}>
+                <input
+                  className={styles.weightInputControl}
+                  value={knownWeight}
+                  inputMode="decimal"
+                  aria-label="Känd vikt i kilogram"
+                  onChange={(event) =>
+                    setKnownWeight(sanitizeDecimalInput(event.currentTarget.value))
+                  }
+                />
+
+                <span className={styles.weightUnitLabel}>kg</span>
+              </div>
             </section>
 
-            <section className={styles.binderRatioArea} aria-label="Bindare">
-              <div className={styles.controlRowsGrid}>
-                {binders.length === 0 ? (
-                  <div className={styles.ratioEmptyState}>Inga bindare</div>
-                ) : (
-                  <div className={styles.binderControlRowWithSeparators}>
-                    {binders.map((item, index) => (
-                      <Fragment key={item.id}>
-                        {index > 0 && (
-                          <span className={styles.binderRatioSeparator} aria-hidden="true">
-                            :
-                          </span>
-                        )}
-                        <div className={styles.binderRatioCardSlot}>
-                          <ControlBinderCard
+            <section className={styles.binderSectionGroup} aria-label="Bindare">
+              <div className={styles.binderSectionRatioSlot}>
+                <div className={styles.controlRowsGrid}>
+                  {binders.length === 0 ? (
+                    <div className={styles.ratioEmptyState}>Inga bindare</div>
+                  ) : (
+                    <div className={styles.binderControlRowWithSeparators}>
+                      {binders.map((item, index) => (
+                        <Fragment key={item.id}>
+                          {index > 0 && (
+                            <span className={styles.binderRatioSeparator} aria-hidden="true">
+                              :
+                            </span>
+                          )}
+                          <div className={styles.binderRatioCardSlot}>
+                            <ControlBinderCard
+                              item={item}
+                              canDelete={canDeleteBinder(item, binders)}
+                              readOnly={recipeLocked}
+                              onValueChange={updateBinderValue}
+                              onDelete={deleteBinder}
+                            />
+                          </div>
+                        </Fragment>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.sectionGroupActionSlot}>
+                <button
+                  className={styles.selectActionOutlineControl}
+                  type="button"
+                  onClick={addBinder}
+                  disabled={recipeLocked}
+                >
+                  + Bindarkomponent
+                </button>
+              </div>
+            </section>
+
+            <section className={styles.additiveSectionGroup} aria-label="Tillägg">
+              <div className={styles.additiveSectionRatioSlot}>
+                <div className={styles.controlRowsGrid}>
+                  {additives.length === 0 ? (
+                    <div className={styles.ratioEmptyState}>Inga tillägg</div>
+                  ) : (
+                    <div className={styles.additiveControlRow}>
+                      {additives.map((item) => (
+                        <div key={item.id} className={styles.additiveRatioCardSlot}>
+                          <ControlAdditiveCard
                             item={item}
-                            canDelete={canDeleteBinder(item, binders)}
-                            onValueChange={updateBinderValue}
-                            onDelete={deleteBinder}
+                            readOnly={recipeLocked}
+                            onValueChange={updateAdditiveValue}
+                            onDelete={deleteAdditive}
                           />
                         </div>
-                      </Fragment>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </section>
 
-            <section
-              className={styles.binderActionArea}
-              aria-label="Lägg till bindare"
-            >
-              <button
-                className={styles.selectActionControl}
-                type="button"
-                onClick={addBinder}
-              >
-                + Bindarkomponent
-              </button>
-            </section>
-
-            <section className={styles.additiveRatioArea} aria-label="Tillägg">
-              <div className={styles.controlRowsGrid}>
-                {additives.length === 0 ? (
-                  <div className={styles.ratioEmptyState}>Inga tillägg</div>
-                ) : (
-                  <div className={styles.additiveControlRow}>
-                    {additives.map((item) => (
-                      <div key={item.id} className={styles.additiveRatioCardSlot}>
-                        <ControlAdditiveCard
-                          item={item}
-                          onValueChange={updateAdditiveValue}
-                          onDelete={deleteAdditive}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <div className={styles.sectionGroupActionSlot}>
+                <AdditiveSelectControl
+                  additives={additives}
+                  onChange={addAdditive}
+                  disabled={recipeLocked}
+                />
               </div>
-            </section>
-
-            <section
-              className={styles.additiveActionArea}
-              aria-label="Lägg till tillägg"
-            >
-              <AdditiveSelectControl additives={additives} onChange={addAdditive} />
             </section>
           </div>
         </div>
@@ -594,21 +654,23 @@ function CardDeleteButton({
 function ControlBinderCard({
   item,
   canDelete,
+  readOnly = false,
   onValueChange,
   onDelete,
 }: Readonly<{
   item: RatioItem
   canDelete: boolean
+  readOnly?: boolean
   onValueChange: (id: string, value: string) => void
   onDelete: (id: string) => void
 }>) {
   return (
     <article className={styles.resultCard}>
       <div className={styles.resultCardHeader}>
-        <span className={styles.resultCardHeaderTitle}>{item.label}</span>
+        <span className={getBinderLabelClass(item.label)}>{item.label}</span>
         <CardDeleteButton
           label={item.label}
-          disabled={!canDelete}
+          disabled={!canDelete || readOnly}
           onClick={() => onDelete(item.id)}
         />
       </div>
@@ -617,6 +679,7 @@ function ControlBinderCard({
         value={item.value}
         inputMode="numeric"
         pattern="[0-9]*"
+        disabled={readOnly}
         aria-label={`${item.label} ${item.unit}`}
         onChange={(event) => {
           const nextValue = event.currentTarget.value.replace(/\D/g, "");
@@ -630,24 +693,31 @@ function ControlBinderCard({
 
 function ControlAdditiveCard({
   item,
+  readOnly = false,
   onValueChange,
   onDelete,
 }: Readonly<{
   item: RatioItem
+  readOnly?: boolean
   onValueChange: (id: string, value: string) => void
   onDelete: (id: string) => void
 }>) {
   return (
     <article className={styles.resultCard}>
       <div className={styles.resultCardHeader}>
-        <span className={styles.resultCardHeaderTitle}>{item.nameUnit}</span>
-        <CardDeleteButton label={item.nameUnit} onClick={() => onDelete(item.id)} />
+        <span className={getAdditiveLabelClass(item.nameUnit)}>{item.nameUnit}</span>
+        <CardDeleteButton
+          label={item.nameUnit}
+          disabled={readOnly}
+          onClick={() => onDelete(item.id)}
+        />
       </div>
       <input
         className={styles.ratioValueInput}
         value={item.value}
         inputMode="numeric"
         pattern="[0-9]*"
+        disabled={readOnly}
         aria-label={`${item.nameUnit} ${item.unit}`}
         onChange={(event) => {
           const nextValue = event.currentTarget.value.replace(/\D/g, '')
@@ -659,12 +729,20 @@ function ControlAdditiveCard({
   )
 }
 
-function ResultCard({ item }: Readonly<{ item: ResultItem }>) {
+function ResultCard({
+  item,
+  kind,
+}: Readonly<{ item: ResultItem; kind: 'binder' | 'additive' }>) {
+  const labelClassName =
+    kind === 'binder'
+      ? getBinderLabelClass(item.label)
+      : getAdditiveLabelClass(item.nameUnit)
+
   return (
-    <article className={styles.resultCard}>
-      <span className={styles.resultLabel}>{item.label}</span>
-      <strong className={styles.resultValue}>{item.value}</strong>
-      <span className={styles.resultUnit}>{item.unit}</span>
+    <article className={styles.resultOutputCard} aria-label={`${item.label} ${item.value} ${item.unit}`}>
+      <span className={labelClassName}>{item.label}</span>
+      <strong className={styles.resultOutputValue}>{item.value}</strong>
+      <span className={styles.resultOutputUnit}>{item.unit}</span>
     </article>
   )
 }

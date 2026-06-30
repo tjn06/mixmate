@@ -13,10 +13,133 @@ const radiusMd = createVar('radiusMd');
 
 const controlPaddingX = createVar('controlPaddingX');
 const controlGap = createVar('controlGap');
+const gridRowHeight = createVar('gridRowHeight');
 
 const ratioLabelWidth = createVar('ratioLabelWidth');
 const ratioUnitWidth = createVar('ratioUnitWidth');
 const ratioDeleteWidth = createVar('ratioDeleteWidth');
+
+/*
+ * Modern dashboard palette (Linear / Vercel / GitHub Dark inspired).
+ * Three layers: canvas → surfaces → recessed inputs.
+ * Section groups use stepped surfaces + semantic stripe accents.
+ */
+const colorBg = createVar('colorBg');
+const colorBgGradient = createVar('colorBgGradient');
+const colorSurface = createVar('colorSurface');
+const colorInputBg = createVar('colorInputBg');
+const colorText = createVar('colorText');
+const colorTextHeading = createVar('colorTextHeading');
+const colorBorder = createVar('colorBorder');
+const colorInputBorder = createVar('colorInputBorder');
+const colorAccent = createVar('colorAccent');
+const colorAccentBg = createVar('colorAccentBg');
+const colorActionBorder = createVar('colorActionBorder');
+const colorFocus = createVar('colorFocus');
+const colorShadow = createVar('colorShadow');
+const colorOnAccent = createVar('colorOnAccent');
+const colorGroupResultSurface = createVar('colorGroupResultSurface');
+const colorGroupResultStripe = createVar('colorGroupResultStripe');
+const colorGroupInputSurface = createVar('colorGroupInputSurface');
+const colorGroupInputStripe = createVar('colorGroupInputStripe');
+const colorGroupRecipeSurface = createVar('colorGroupRecipeSurface');
+const colorGroupBinderSurface = createVar('colorGroupBinderSurface');
+const colorGroupBinderStripe = createVar('colorGroupBinderStripe');
+const colorGroupAdditiveSurface = createVar('colorGroupAdditiveSurface');
+const colorGroupAdditiveStripe = createVar('colorGroupAdditiveStripe');
+const colorResultCard = createVar('colorResultCard');
+const colorResultDisclosure = createVar('colorResultDisclosure');
+const colorResultValue = createVar('colorResultValue');
+const colorGroupTotalSurface = createVar('colorGroupTotalSurface');
+const colorWarning = createVar('colorWarning');
+const colorComponentA = createVar('colorComponentA');
+const colorComponentB = createVar('colorComponentB');
+const colorComponentC = createVar('colorComponentC');
+const colorComponentD = createVar('colorComponentD');
+const colorComponentSand = createVar('colorComponentSand');
+
+/** Light — clean dashboard (Vercel-style) */
+const themeVarsLight = {
+  [colorBg]: '#F4F6F9',
+  [colorBgGradient]: '#E9EEF4',
+  [colorSurface]: '#FFFFFF',
+  [colorInputBg]: '#F8FAFC',
+  [colorText]: '#64748B',
+  [colorTextHeading]: '#0F172A',
+  [colorBorder]: '#E2E8F0',
+  [colorInputBorder]: '#CBD5E1',
+  [colorAccent]: '#2563EB',
+  [colorAccentBg]: 'rgba(37, 99, 235, 0.1)',
+  [colorActionBorder]: '#1D4ED8',
+  [colorFocus]: '#3B82F6',
+  [colorShadow]: '0 2px 8px rgba(15, 23, 42, 0.06), 0 8px 20px rgba(15, 23, 42, 0.08)',
+  [colorOnAccent]: '#FFFFFF',
+  [colorGroupResultSurface]: '#EEF2F7',
+  [colorGroupResultStripe]: '#0EA5E9',
+  [colorGroupInputSurface]: '#FFFFFF',
+  [colorGroupInputStripe]: '#2563EB',
+  [colorGroupRecipeSurface]: '#F8FAFC',
+  [colorGroupBinderSurface]: '#F8FAFC',
+  [colorGroupBinderStripe]: '#2563EB',
+  [colorGroupAdditiveSurface]: '#E2E8F0',
+  [colorGroupAdditiveStripe]: '#2563EB',
+  [colorResultCard]: '#F1F5F9',
+  [colorResultValue]: '#0F172A',
+  [colorResultDisclosure]: '#2563EB',
+  [colorGroupTotalSurface]: '#E2E8F0',
+  [colorWarning]: '#EA580C',
+  [colorComponentA]: '#2563EB',
+  [colorComponentB]: '#10B981',
+  [colorComponentC]: '#8B5CF6',
+  [colorComponentD]: '#64748B',
+  [colorComponentSand]: '#94A3B8',
+};
+
+/** Dark — mockup-inspired dashboard */
+const themeVarsDark = {
+  [colorBg]: '#0B1220',
+  [colorBgGradient]: '#0D1524',
+  [colorSurface]: '#121C2B',
+  [colorInputBg]: '#0A121F',
+  [colorText]: '#93A4BC',
+  [colorTextHeading]: '#F8FAFC',
+  [colorBorder]: '#27374D',
+  [colorInputBorder]: '#32435D',
+  [colorAccent]: '#3B82F6',
+  [colorAccentBg]: 'rgba(59, 130, 246, 0.12)',
+  [colorActionBorder]: '#2563EB',
+  [colorFocus]: '#3B82F6',
+  [colorShadow]: '0 2px 8px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.35)',
+  [colorOnAccent]: '#FFFFFF',
+  [colorGroupResultSurface]: '#161F30',
+  [colorGroupResultStripe]: '#3B82F6',
+  [colorGroupInputSurface]: '#121C2B',
+  [colorGroupInputStripe]: '#3B82F6',
+  [colorGroupRecipeSurface]: '#131D2C',
+  [colorGroupBinderSurface]: '#151E2D',
+  [colorGroupBinderStripe]: '#3B82F6',
+  [colorGroupAdditiveSurface]: '#101826',
+  [colorGroupAdditiveStripe]: '#3B82F6',
+  [colorResultCard]: '#0A121F',
+  [colorResultValue]: '#F8FAFC',
+  [colorResultDisclosure]: '#3B82F6',
+  [colorGroupTotalSurface]: '#0D1624',
+  [colorWarning]: '#FB923C',
+  [colorComponentA]: '#3B82F6',
+  [colorComponentB]: '#34D399',
+  [colorComponentC]: '#A78BFA',
+  [colorComponentD]: '#94A3B8',
+  [colorComponentSand]: '#C4B5A0',
+};
+
+const themeRoot = {
+  vars: themeVarsDark,
+  '@media': {
+    '(prefers-color-scheme: light)': {
+      vars: themeVarsLight,
+    },
+  },
+};
 
 globalStyle('html, body, #root', {
   margin: 0,
@@ -50,26 +173,33 @@ const fullAreaGrid = style({
   display: 'grid',
 });
 
-export const pageFrame = style({
-  width: '100%',
-  minHeight: '100dvh',
-  display: 'grid',
-  placeItems: 'center',
-  background: '#111',
-  fontFamily:
-    'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-});
+export const pageFrame = style([
+  themeRoot,
+  {
+    width: '100%',
+    minHeight: '100dvh',
+    display: 'grid',
+    placeItems: 'center',
+    background: `linear-gradient(180deg, ${colorBg} 0%, ${colorBgGradient} 100%)`,
+    color: colorText,
+    fontFamily:
+      '"Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
+  },
+]);
 
-export const mobileViewport = style({
-  width: 'min(100vw, 430px)',
-  height: 'min(100dvh, 932px)',
+export const mobileViewport = style([
+  themeRoot,
+  {
+    width: 'min(100vw, 430px)',
+    height: 'min(100dvh, 932px)',
 
-  containerName: 'app',
-  containerType: 'size',
+    containerName: 'app',
+    containerType: 'size',
 
-  overflow: 'hidden',
-  background: '#f3f3f3',
-});
+    overflow: 'hidden',
+    background: `linear-gradient(180deg, ${colorBg} 0%, ${colorBgGradient} 100%)`,
+  },
+]);
 
 export const appScrollLayer = style({
   width: '100%',
@@ -109,6 +239,7 @@ export const calculatorGrid = style({
 
     [controlPaddingX]: 'clamp(8px, min(3cqw, 1.6cqh), 14px)',
     [controlGap]: 'clamp(3px, min(1.1cqw, 0.7cqh), 7px)',
+    [gridRowHeight]: `calc((100cqh - 2 * ${appPadding} - 14 * ${appGap}) / 15)`,
 
     [ratioLabelWidth]: 'clamp(26px, 9cqw, 40px)',
     [ratioUnitWidth]: 'clamp(40px, 13cqw, 58px)',
@@ -155,80 +286,172 @@ export const headerArea = style([
   },
 ]);
 
-export const resultsArea = style([
+export const resultsSectionGroup = style([
   areaBase,
   {
     gridRow: 'span 5',
     display: 'grid',
     gridTemplateRows: 'minmax(0, 0.8fr) minmax(0, 3fr) minmax(0, 1.2fr)',
-    gap: appGap,
+    gap: controlGap,
+
+    background: colorGroupResultSurface,
+    border: `1px solid ${colorBorder}`,
+    borderLeft: `4px solid ${colorGroupResultStripe}`,
+    borderRadius: radiusMd,
+    boxShadow: colorShadow,
+    padding: 'clamp(4px, min(1.1cqw, 0.65cqh), 7px)',
   },
 ]);
 
-export const knownComponentArea = style([
-    areaBase,
-    fullAreaGrid,
-    {
-      gridRow: 'span 1',
-      overflow: 'visible',
-      position: 'relative',
-      zIndex: 30,
-    },
-  ]);
+export const resultsSectionDisclosureSlot = style({
+  minWidth: 0,
+  minHeight: 0,
+});
 
-export const knownWeightArea = style([
+export const resultsSectionRowsSlot = style({
+  minWidth: 0,
+  minHeight: 0,
+
+  paddingTop: controlGap,
+  borderTop: `1px solid ${colorBorder}`,
+});
+
+export const resultsSectionTotalSlot = style({
+  minWidth: 0,
+  minHeight: 0,
+
+  paddingTop: controlGap,
+  borderTop: `1px solid ${colorBorder}`,
+});
+
+export const knownInputGroup = style([
+  areaBase,
+  {
+    gridRow: 'span 2',
+    display: 'grid',
+    gridTemplateRows: 'repeat(2, minmax(0, 1fr))',
+    gap: controlGap,
+    overflow: 'visible',
+    position: 'relative',
+    zIndex: 30,
+
+    background: colorGroupInputSurface,
+    border: `1px solid ${colorBorder}`,
+    borderLeft: `3px solid ${colorAccent}`,
+    borderRadius: radiusMd,
+    boxShadow: colorShadow,
+    padding: 'clamp(4px, min(1.1cqw, 0.65cqh), 7px)',
+  },
+]);
+
+export const knownInputGroupSelectSlot = style([
+  fullAreaGrid,
+  {
+    minWidth: 0,
+    minHeight: 0,
+    overflow: 'visible',
+  },
+]);
+
+export const knownInputGroupWeightRow = style({
+  minWidth: 0,
+  minHeight: 0,
+
+  display: 'grid',
+  gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 0.28fr)',
+  gap: appGap,
+
+  paddingTop: controlGap,
+  borderTop: `1px solid ${colorBorder}`,
+});
+
+export const recipeSectionGroup = style([
   areaBase,
   {
     gridRow: 'span 1',
     display: 'grid',
-    gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 0.28fr)',
-    gap: appGap,
+    overflow: 'visible',
+    position: 'relative',
+    zIndex: 35,
+
+    background: colorGroupRecipeSurface,
+    border: `1px solid ${colorBorder}`,
+    borderLeft: `3px solid ${colorAccent}`,
+    borderRadius: radiusMd,
+    boxShadow: colorShadow,
+    padding: 'clamp(4px, min(1.1cqw, 0.65cqh), 7px)',
   },
 ]);
 
-export const recipeArea = style([
-    areaBase,
-    fullAreaGrid,
-    {
-      gridRow: 'span 1',
-      overflow: 'visible',
-      position: 'relative',
-      zIndex: 20,
-    },
-  ]);
-
-export const binderRatioArea = style([
-  areaBase,
-  {
-    gridRow: 'span 2',
-  },
-]);
-
-export const binderActionArea = style([
-  areaBase,
+export const recipeSectionSelectSlot = style([
   fullAreaGrid,
   {
-    gridRow: 'span 1',
+    minWidth: 0,
+    minHeight: 0,
+    overflow: 'visible',
   },
 ]);
 
-export const additiveRatioArea = style([
+export const binderSectionGroup = style([
   areaBase,
   {
-    gridRow: 'span 2',
+    gridRow: 'span 3',
+    display: 'grid',
+    gridTemplateRows: 'minmax(0, 2fr) minmax(0, 1fr)',
+    gap: controlGap,
+
+    background: colorGroupBinderSurface,
+    border: `1px solid ${colorBorder}`,
+    borderLeft: `3px solid ${colorAccent}`,
+    borderRadius: radiusMd,
+    boxShadow: colorShadow,
+    padding: 'clamp(4px, min(1.1cqw, 0.65cqh), 7px)',
   },
 ]);
 
-export const additiveActionArea = style([
-    areaBase,
-    fullAreaGrid,
-    {
-      gridRow: 'span 1',
-      overflow: 'visible',
-      position: 'relative',
-      zIndex: 40,
-    },
-  ]);
+export const binderSectionRatioSlot = style({
+  minWidth: 0,
+  minHeight: 0,
+  height: '100%',
+});
+
+export const additiveSectionGroup = style([
+  areaBase,
+  {
+    gridRow: 'span 3',
+    display: 'grid',
+    gridTemplateRows: 'minmax(0, 2fr) minmax(0, 1fr)',
+    gap: controlGap,
+    overflow: 'visible',
+    position: 'relative',
+    zIndex: 40,
+
+    background: colorGroupAdditiveSurface,
+    border: `1px solid ${colorBorder}`,
+    borderLeft: `3px solid ${colorAccent}`,
+    borderRadius: radiusMd,
+    boxShadow: colorShadow,
+    padding: 'clamp(4px, min(1.1cqw, 0.65cqh), 7px)',
+  },
+]);
+
+export const additiveSectionRatioSlot = style({
+  minWidth: 0,
+  minHeight: 0,
+  height: '100%',
+});
+
+export const sectionGroupActionSlot = style([
+  fullAreaGrid,
+  {
+    minWidth: 0,
+    minHeight: 0,
+    overflow: 'visible',
+
+    paddingTop: controlGap,
+    borderTop: `1px solid ${colorBorder}`,
+  },
+]);
 
 export const appTitle = style({
   margin: 0,
@@ -236,7 +459,8 @@ export const appTitle = style({
 
   fontSize: fontLg,
   lineHeight: 1,
-  fontWeight: 850,
+  fontWeight: 600,
+  color: colorTextHeading,
 
   whiteSpace: 'nowrap',
   overflow: 'hidden',
@@ -268,40 +492,54 @@ const inputControlBase = style({
   width: '100%',
   height: '100%',
 
-  border: '2px solid #dcdcdc',
+  border: `2px solid ${colorInputBorder}`,
   borderRadius: radiusMd,
   paddingInline: controlPaddingX,
 
-  background: '#ffffff',
-  color: '#111',
+  background: colorInputBg,
+  color: colorTextHeading,
+  caretColor: colorFocus,
 
   fontSize: fontMd,
   lineHeight: 1.15,
-  fontWeight: 750,
+  fontWeight: 600,
   textAlign: 'center',
 
   selectors: {
     '&:focus': {
       outline: 'none',
-      borderColor: '#111',
+      borderColor: colorFocus,
+    },
+    '&:disabled': {
+      opacity: 0.55,
+      cursor: 'not-allowed',
     },
   },
 });
 
+const cardSurfaceBase = {
+  background: colorSurface,
+  border: `1px solid ${colorBorder}`,
+  boxShadow: colorShadow,
+};
+
 export const resultDisclosureControl = style([
   controlBase,
   {
-    background: '#ffffff',
-    color: '#222',
+    background: colorResultCard,
+    color: colorResultDisclosure,
     fontSize: fontSm,
+    fontWeight: 600,
+    border: `1px solid ${colorBorder}`,
+    boxShadow: 'none',
   },
 ]);
 
 export const fullRowSelectControl = style([
   controlBase,
   {
-    background: '#ffffff',
-    color: '#111',
+    ...cardSurfaceBase,
+    color: colorTextHeading,
   },
 ]);
 
@@ -317,15 +555,47 @@ export const weightUnitLabel = style({
 
   fontSize: fontMd,
   lineHeight: 1.15,
-  fontWeight: 750,
-  color: '#111',
+  fontWeight: 600,
+  color: colorTextHeading,
 });
 
 export const selectActionControl = style([
   controlBase,
   {
-    background: '#111',
-    color: '#ffffff',
+    background: colorAccent,
+    color: colorOnAccent,
+    fontWeight: 600,
+    border: `1px solid ${colorActionBorder}`,
+    boxShadow: 'none',
+  },
+]);
+
+export const selectActionOutlineControl = style([
+  controlBase,
+  {
+    background: 'transparent',
+    color: colorAccent,
+    fontWeight: 600,
+    border: `1px solid ${colorAccent}`,
+    boxShadow: 'none',
+
+    selectors: {
+      '&:disabled': {
+        opacity: 0.45,
+        cursor: 'not-allowed',
+      },
+    },
+  },
+]);
+
+export const selectSurfaceControl = style([
+  controlBase,
+  {
+    background: colorInputBg,
+    color: colorTextHeading,
+    fontWeight: 600,
+    border: `1px solid ${colorInputBorder}`,
+    boxShadow: 'none',
   },
 ]);
 
@@ -392,8 +662,8 @@ export const resultCard = style({
   borderRadius: radiusMd,
   padding: 'clamp(3px, min(1cqw, 0.6cqh), 6px)',
 
-  background: '#ffffff',
-  color: '#111',
+  ...cardSurfaceBase,
+  color: colorTextHeading,
 
   overflow: 'hidden',
 });
@@ -415,13 +685,105 @@ export const resultCardHeaderTitle = style({
 
   fontSize: fontXs,
   lineHeight: 1,
-  fontWeight: 650,
+  fontWeight: 600,
   textAlign: 'left',
+  color: colorTextHeading,
 
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
 });
+
+const componentLabelBase = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: controlGap,
+  minWidth: 0,
+  flex: '1 1 auto',
+  fontSize: fontXs,
+  lineHeight: 1,
+  fontWeight: 600,
+  textAlign: 'left' as const,
+  whiteSpace: 'nowrap' as const,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis' as const,
+};
+
+export const binderLabelA = style([
+  componentLabelBase,
+  {
+    color: colorComponentA,
+    selectors: {
+      '&::before': {
+        content: '""',
+        width: 'clamp(5px, min(1.4cqw, 0.8cqh), 7px)',
+        height: 'clamp(5px, min(1.4cqw, 0.8cqh), 7px)',
+        borderRadius: '50%',
+        background: colorComponentA,
+        flexShrink: 0,
+      },
+    },
+  },
+]);
+
+export const binderLabelB = style([
+  componentLabelBase,
+  {
+    color: colorComponentB,
+    selectors: {
+      '&::before': {
+        content: '""',
+        width: 'clamp(5px, min(1.4cqw, 0.8cqh), 7px)',
+        height: 'clamp(5px, min(1.4cqw, 0.8cqh), 7px)',
+        borderRadius: '50%',
+        background: colorComponentB,
+        flexShrink: 0,
+      },
+    },
+  },
+]);
+
+export const binderLabelC = style([
+  componentLabelBase,
+  {
+    color: colorComponentC,
+    selectors: {
+      '&::before': {
+        content: '""',
+        width: 'clamp(5px, min(1.4cqw, 0.8cqh), 7px)',
+        height: 'clamp(5px, min(1.4cqw, 0.8cqh), 7px)',
+        borderRadius: '50%',
+        background: colorComponentC,
+        flexShrink: 0,
+      },
+    },
+  },
+]);
+
+export const binderLabelD = style([
+  componentLabelBase,
+  {
+    color: colorComponentD,
+    selectors: {
+      '&::before': {
+        content: '""',
+        width: 'clamp(5px, min(1.4cqw, 0.8cqh), 7px)',
+        height: 'clamp(5px, min(1.4cqw, 0.8cqh), 7px)',
+        borderRadius: '50%',
+        background: colorComponentD,
+        flexShrink: 0,
+      },
+    },
+  },
+]);
+
+export const additiveLabelSand = style([
+  componentLabelBase,
+  {
+    color: colorComponentSand,
+    textTransform: 'capitalize',
+  },
+]);
 
 export const resultCardDeleteButton = style({
   flex: '0 0 auto',
@@ -434,23 +796,23 @@ export const resultCardDeleteButton = style({
   background: 'transparent',
   boxShadow: 'none',
   appearance: 'none',
-  color: '#888',
+  color: colorText,
   cursor: 'pointer',
   lineHeight: 0,
 
   selectors: {
     '&:disabled': {
-      opacity: 0.3,
+      opacity: 0.25,
       cursor: 'default',
     },
     '&:not(:disabled):hover': {
-      color: '#111',
+      color: colorTextHeading,
     },
     '&:focus': {
       outline: 'none',
     },
     '&:focus-visible': {
-      outline: '2px solid #111',
+      outline: `2px solid ${colorFocus}`,
       outlineOffset: '2px',
       borderRadius: radiusSm,
     },
@@ -462,6 +824,101 @@ export const resultCardDeleteIcon = style({
   flexShrink: 0,
 });
 
+
+export const resultOutputCard = style({
+  minWidth: 0,
+  minHeight: 0,
+  height: '100%',
+
+  display: 'grid',
+  gridTemplateRows: 'minmax(0, 0.8fr) minmax(0, 1.4fr) minmax(0, 0.8fr)',
+  alignItems: 'center',
+  justifyItems: 'stretch',
+
+  borderRadius: radiusMd,
+  padding: 'clamp(3px, min(1cqw, 0.6cqh), 6px)',
+
+  background: colorResultCard,
+  border: `2px solid ${colorInputBorder}`,
+  boxShadow: 'none',
+  color: colorText,
+
+  overflow: 'hidden',
+  userSelect: 'text',
+});
+
+export const resultOutputTotalCard = style({
+  minWidth: 0,
+  minHeight: 0,
+  height: '100%',
+
+  display: 'grid',
+  gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr) auto',
+  alignItems: 'center',
+  gap: controlGap,
+
+  borderRadius: radiusMd,
+  paddingInline: controlPaddingX,
+
+  background: colorGroupTotalSurface,
+  border: `1px solid ${colorBorder}`,
+  boxShadow: 'none',
+  color: colorText,
+
+  overflow: 'hidden',
+  userSelect: 'text',
+});
+
+export const resultOutputLabel = style({
+  minWidth: 0,
+  maxWidth: '100%',
+
+  fontSize: fontXs,
+  lineHeight: 1,
+  fontWeight: 600,
+  color: colorText,
+
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+});
+
+export const resultOutputValue = style({
+  minWidth: 0,
+  maxWidth: '100%',
+
+  fontSize: fontMd,
+  lineHeight: 1,
+  fontWeight: 700,
+  color: colorResultValue,
+  fontVariantNumeric: 'tabular-nums',
+
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+});
+
+export const resultOutputUnit = style({
+  minWidth: 0,
+  maxWidth: '100%',
+
+  fontSize: fontXs,
+  lineHeight: 1,
+  fontWeight: 600,
+  color: colorText,
+
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+});
+
+export const resultOutputTotalValue = style([
+  resultOutputValue,
+  {
+    fontSize: fontLg,
+    fontWeight: 750,
+  },
+]);
 
 export const totalResultCard = style({
   minWidth: 0,
@@ -476,8 +933,8 @@ export const totalResultCard = style({
   borderRadius: radiusMd,
   paddingInline: controlPaddingX,
 
-  background: '#111',
-  color: '#ffffff',
+  ...cardSurfaceBase,
+  color: colorTextHeading,
 
   overflow: 'hidden',
 });
@@ -488,7 +945,8 @@ export const resultLabel = style({
 
   fontSize: fontXs,
   lineHeight: 1,
-  fontWeight: 650,
+  fontWeight: 600,
+  color: colorText,
 
   whiteSpace: 'nowrap',
   overflow: 'hidden',
@@ -501,7 +959,8 @@ export const resultValue = style({
 
   fontSize: fontMd,
   lineHeight: 1,
-  fontWeight: 850,
+  fontWeight: 600,
+  color: colorTextHeading,
 
   whiteSpace: 'nowrap',
   overflow: 'hidden',
@@ -514,7 +973,8 @@ export const resultUnit = style({
 
   fontSize: fontXs,
   lineHeight: 1,
-  fontWeight: 650,
+  fontWeight: 600,
+  color: colorText,
 
   whiteSpace: 'nowrap',
   overflow: 'hidden',
@@ -595,8 +1055,8 @@ const controlFourColumnsRowBase = style({
 
     fontSize: fontMd,
     lineHeight: 1,
-    fontWeight: 850,
-    color: '#111',
+    fontWeight: 600,
+    color: colorText,
   });
 
   export const additiveControlRow = style({
@@ -662,12 +1122,12 @@ export const ratioEmptyState = style({
   borderRadius: radiusMd,
   paddingInline: controlPaddingX,
 
-  background: '#ffffff',
-  color: '#777',
+  ...cardSurfaceBase,
 
   fontSize: fontSm,
-  fontWeight: 700,
+  fontWeight: 600,
   lineHeight: 1,
+  color: colorText,
 
   whiteSpace: 'nowrap',
   overflow: 'hidden',
@@ -687,7 +1147,7 @@ export const ratioControlFourColumns = style({
   borderRadius: radiusMd,
   padding: 'clamp(3px, min(1cqw, 0.6cqh), 6px)',
 
-  background: '#ffffff',
+  ...cardSurfaceBase,
 
   overflow: 'hidden',
 
@@ -712,7 +1172,7 @@ export const ratioControlThreeColumns = style({
     borderRadius: radiusMd,
     padding: 'clamp(3px, min(1cqw, 0.6cqh), 6px)',
   
-    background: '#ffffff',
+    ...cardSurfaceBase,
   
     overflow: 'hidden',
   
@@ -745,8 +1205,8 @@ const ratioSegmentBase = style({
 export const ratioLabelSegment = style([
   ratioSegmentBase,
   {
-    background: '#e9e9e9',
-    color: '#111',
+    background: colorAccentBg,
+    color: colorTextHeading,
   },
 ]);
 
@@ -761,20 +1221,20 @@ export const ratioValueInput = style([
 export const ratioUnitSegment = style([
   ratioSegmentBase,
   {
-    background: '#e9e9e9',
-    color: '#111',
+    background: colorAccentBg,
+    color: colorTextHeading,
   },
 ]);
 
 export const ratioDeleteSegment = style([
   ratioSegmentBase,
   {
-    background: '#dcdcdc',
-    color: '#111',
+    background: colorSurface,
+    color: colorText,
 
     selectors: {
       '&:disabled': {
-        opacity: 0.35,
+        opacity: 0.25,
       },
     },
   },
@@ -795,17 +1255,28 @@ export const appSelectRoot = style({
       },
     },
   });
+
+export const appSelectRootOpen = style({
+  zIndex: 200,
+});
   
   export const appSelectTrigger = style([
-    selectActionControl,
-    {
-      position: 'relative',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      textAlign: 'center',
-    },
-  ]);
+  selectActionOutlineControl,
+  {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    transition: 'box-shadow 120ms ease, border-color 120ms ease',
+  },
+]);
+
+export const appSelectTriggerOpen = style({
+  outline: 'none',
+  borderColor: colorAccent,
+  boxShadow: `0 0 0 3px ${colorAccentBg}`,
+});
   
   export const appSelectTriggerText = style({
     minWidth: 0,
@@ -827,24 +1298,32 @@ export const appSelectRoot = style({
     fontSize: fontSm,
     lineHeight: 1.15,
     opacity: 0.75,
+    transition: 'transform 120ms ease',
   });
+
+export const appSelectChevronOpen = style({
+  transform: 'translateY(-50%) rotate(180deg)',
+});
   
   export const appSelectPanel = style({
     position: 'absolute',
     left: 0,
     right: 0,
     zIndex: 1000,
-  
+
     display: 'grid',
-    gap: appGap,
-  
+    gap: controlGap,
+
     padding: appGap,
     borderRadius: radiusMd,
-  
-    background: '#ffffff',
-    boxShadow: '0 12px 32px rgb(0 0 0 / 0.24)',
-  
-    overflow: 'hidden',
+
+    background: colorSurface,
+    border: `1px solid ${colorAccent}`,
+    boxShadow: colorShadow,
+
+    maxHeight: `min(calc(6 * ${gridRowHeight} + 5 * ${controlGap} + 2 * ${appPadding}), 55cqh)`,
+    overflowY: 'auto',
+    WebkitOverflowScrolling: 'touch',
   });
   
   export const appSelectPanelDown = style({
@@ -854,16 +1333,50 @@ export const appSelectRoot = style({
   export const appSelectPanelUp = style({
     bottom: `calc(100% + ${appGap})`,
   });
+
+export const appSelectPanelOpen = style({
+  border: `2px solid ${colorAccent}`,
+  boxShadow: `${colorShadow}, 0 0 0 3px ${colorAccentBg}`,
+});
+
+export const appSelectPanelHeading = style({
+  minHeight: gridRowHeight,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingInline: controlPaddingX,
+
+  fontSize: fontXs,
+  lineHeight: 1.15,
+  fontWeight: 600,
+  textAlign: 'center',
+  color: colorText,
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
+});
   
   export const appSelectOption = style([
-    selectActionControl,
+    selectActionOutlineControl,
     {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: gridRowHeight,
+      minHeight: gridRowHeight,
+      paddingBlock: 0,
+      fontSize: fontMd,
+      lineHeight: 1.15,
+      fontWeight: 600,
       textAlign: 'center',
-  
+
       selectors: {
         '&[aria-selected="true"]': {
-          background: '#ffffff',
-          color: '#111',
+          background: colorAccentBg,
+          color: colorAccent,
+          borderColor: colorAccent,
+        },
+        '&:hover': {
+          background: colorAccentBg,
         },
       },
     },

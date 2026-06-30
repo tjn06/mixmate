@@ -44,9 +44,9 @@ export function RecipeCard() {
             selectRecipe(event.target.value as 'custom' | 'repair-standard' | 'sockel-fas')
           }
         >
-          <option value="custom">✏️ Valfri</option>
-          <option value="repair-standard">🔒 Lagning standard</option>
-          <option value="sockel-fas">🔒 Sockel / Fas</option>
+          <option value="custom">✏️ Valfri (Recept)</option>
+          <option value="repair-standard">🔒 Standard lagning (Recept)</option>
+          <option value="sockel-fas">🔒 Sockel / Fas (Recept)</option>
         </select>
       </label>
 
